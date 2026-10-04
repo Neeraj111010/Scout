@@ -1,3 +1,4 @@
+# ./scout/domain/seats.py
 from pydantic import BaseModel, Field
 
 

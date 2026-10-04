@@ -1,3 +1,4 @@
+# ./scout/domain/preferences.py
 from datetime import date as Date
 from datetime import time as Time
 
@@ -8,19 +9,23 @@ class PreferenceSpec(BaseModel):
     """Structured representation of a user's movie-show preferences.
 
     Gemma is responsible for interpreting natural language into this model.
-    Deterministic application code is responsible for using these preferences
-    to filter and rank available shows.
+    Deterministic application code uses these preferences to filter candidates
+    and calculate factual metrics. Personalized ranking can be performed later
+    using those metrics.
     """
 
     movie: str
     """Movie title the user wants to watch."""
+
     party_size: int = Field(gt=0)
-    """Number of people/tickets required for the show."""
+    """Number of people or tickets required for the show."""
 
     date: Date | None = None
     """Preferred date for the show, if the user specified one."""
+
     time_start: Time | None = None
     """Earliest acceptable start time, if a time window was specified."""
+
     time_end: Time | None = None
     """Latest acceptable start time, if a time window was specified."""
 
@@ -32,6 +37,7 @@ class PreferenceSpec(BaseModel):
 
     Example: ["IMAX"] for "IMAX if possible".
     """
+
     acceptable_formats: list[str] = Field(default_factory=list)
     """Formats that are acceptable to the user.
 
@@ -41,7 +47,8 @@ class PreferenceSpec(BaseModel):
 
     preferred_theatres: list[str] = Field(default_factory=list)
     """Theatres the user would prefer, without making them mandatory."""
-    preferred_areas: str | None = None
+
+    preferred_area: str | None = None
     """Preferred geographic area for the theatre, if specified."""
 
     hard_date: bool = False
@@ -49,11 +56,13 @@ class PreferenceSpec(BaseModel):
 
     If true, shows outside the requested date must be rejected.
     """
+
     hard_time: bool = False
     """Whether the specified time window is a hard constraint.
 
     If true, shows outside the requested time window must be rejected.
     """
+
     hard_budget: bool = False
     """Whether the specified budget is a hard constraint.
 

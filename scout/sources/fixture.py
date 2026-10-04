@@ -1,3 +1,4 @@
+# ./scout/sources/fixture.py
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -61,7 +62,7 @@ class FixtureSource:
             ),
             Show(
                 id="dune-3-inox-centre-imax-1845",
-                movie="Dune",
+                movie="Dune 3",
                 theatre="INOX Centre",
                 area="Kochi",
                 starts_at=datetime(2026,10,3,18,45,tzinfo=ist),
