@@ -1,9 +1,9 @@
-#scout/ai/gemma.py
+# ./scout/ai/gemma.py
 import json
 import os
 import re
 from datetime import date as Date
-from datetime import datetime, timedelta
+from datetime import datetime
 from datetime import time as Time
 from zoneinfo import ZoneInfo
 
@@ -65,30 +65,33 @@ class PreferenceNormalizer:
 
     @staticmethod
     def _parse_date(value: str | None, reference_date: Date) -> Date | None:
-        """Convert a date string or weekday name into a concrete calendar date."""
+        """Convert an explicit date string into a concrete calendar date.
+
+        Relative weekdays (e.g. 'saturday') are left null here so the
+        deterministic Preference Resolver can handle them using reference_date."""
         if not value:
             return None
 
         value = value.strip().lower()
 
-        # Handle relative weekday names (e.g. "saturday") robustly
+        # If it's a weekday name, let resolver.py handle it!
         weekdays = {
-            "monday": 0,
-            "tuesday": 1,
-            "wednesday": 2,
-            "thursday": 3,
-            "friday": 4,
-            "saturday": 5,
-            "sunday": 6,
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
         }
-
         if value in weekdays:
-            target_day = weekdays[value]
-            current_day = reference_date.weekday()
-            days_ahead = (target_day - current_day) % 7
-            if days_ahead == 0:
-                days_ahead = 7
-            return reference_date + timedelta(days=days_ahead)
+            return None
+
+        # Preferred machine-readable form.
+        try:
+            return Date.fromisoformat(value)
+        except ValueError:
+            pass
 
         # Preferred machine-readable form.
         try:
@@ -141,7 +144,7 @@ class PreferenceNormalizer:
             return None
 
         value = value.strip()
-        
+
         # If Gemma puts a semantic time word into time_start/time_end by mistake, ignore it
         if value.lower() in {"morning", "afternoon", "evening", "night"}:
             return None
@@ -171,7 +174,9 @@ class PreferenceNormalizer:
         for fmt in ("%I %p", "%I:%M %p"):
             try:
                 # Satisfies Ruff DTZ007 by attaching tzinfo before extracting time
-                return datetime.strptime(value.upper(), fmt).replace(tzinfo=ist_tz).time()
+                return (
+                    datetime.strptime(value.upper(), fmt).replace(tzinfo=ist_tz).time()
+                )
             except ValueError:
                 continue
 
@@ -190,7 +195,9 @@ class GemmaPreferenceInterpreter:
         resolved_model = model or os.getenv("OPEN_WEIGHT_MODEL", "gemma3:4b")
         resolved_base_url = base_url or os.getenv("BASE_URL", "http://localhost:11434")
 
-        self.client = client or OllamaClient(base_url=resolved_base_url, model=resolved_model)
+        self.client = client or OllamaClient(
+            base_url=resolved_base_url, model=resolved_model
+        )
 
     def interpret(
         self,
@@ -310,8 +317,10 @@ time_preference:
     "night"
 
     Examples:
+    "Saturday evening" -> "evening"
     "in the evening" -> "evening"
     "Saturday night" -> "night"
+    "Sunday morning" -> "morning"
 
     If the user gives an exact time or exact time range,
     set time_preference to null.
