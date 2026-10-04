@@ -1,3 +1,4 @@
+# ./scout/domain/preferences.py
 from datetime import date as Date
 from datetime import time as Time
 

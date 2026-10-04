@@ -1,3 +1,4 @@
+# ./scout/matching/evaluator.py
 from scout.domain.matches import CandidateEvaluation
 from scout.domain.metrics import CandidateMetrics
 from scout.domain.preferences import PreferenceSpec
@@ -34,10 +35,7 @@ def _matches_time(show: Show, preferences: PreferenceSpec) -> bool:
     if preferences.time_start is not None and show_time < preferences.time_start:
         return False
 
-    if preferences.time_end is not None and show_time > preferences.time_end:
-        return False
-
-    return True
+    return not (preferences.time_end is not None and show_time > preferences.time_end)
 
 
 def _matches_budget(
