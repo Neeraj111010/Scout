@@ -1,4 +1,3 @@
-# ./scout/domain/preferences.py
 from datetime import date as Date
 from datetime import time as Time
 
@@ -21,29 +20,31 @@ class PreferenceSpec(BaseModel):
     """Number of people or tickets required for the show."""
 
     date: Date | None = None
-    """Preferred date for the show, if the user specified one."""
+    """Exact preferred calendar date, if the user specified one."""
+
+    day_of_week: str | None = None
+    """Preferred day of the week when no exact calendar date was specified.
+
+    Example: "this Saturday" -> "saturday".
+    """
 
     time_start: Time | None = None
-    """Earliest acceptable start time, if a time window was specified."""
+    """Earliest acceptable show start time for an exact time or time range."""
 
     time_end: Time | None = None
-    """Latest acceptable start time, if a time window was specified."""
+    """Latest acceptable show start time for an exact time range."""
+
+    time_preference: str | None = None
+    """Semantic time-of-day preference such as 'morning' or 'evening'."""
 
     max_budget_total: int | None = None
     """Maximum total ticket budget for the entire party, in INR."""
 
     preferred_formats: list[str] = Field(default_factory=list)
-    """Formats the user would prefer, but that do not necessarily exclude a show.
-
-    Example: ["IMAX"] for "IMAX if possible".
-    """
+    """Formats the user would prefer, but that do not necessarily exclude a show."""
 
     acceptable_formats: list[str] = Field(default_factory=list)
-    """Formats that are acceptable to the user.
-
-    These represent options that may be considered when the preferred format
-    is unavailable.
-    """
+    """Formats that are acceptable to the user."""
 
     preferred_theatres: list[str] = Field(default_factory=list)
     """Theatres the user would prefer, without making them mandatory."""
@@ -52,22 +53,13 @@ class PreferenceSpec(BaseModel):
     """Preferred geographic area for the theatre, if specified."""
 
     hard_date: bool = False
-    """Whether the specified date is a hard constraint.
-
-    If true, shows outside the requested date must be rejected.
-    """
+    """Whether the specified date or day is a hard constraint."""
 
     hard_time: bool = False
-    """Whether the specified time window is a hard constraint.
-
-    If true, shows outside the requested time window must be rejected.
-    """
+    """Whether the specified time preference or window is a hard constraint."""
 
     hard_budget: bool = False
-    """Whether the specified budget is a hard constraint.
-
-    If true, shows exceeding the maximum total budget must be rejected.
-    """
+    """Whether the specified budget is a hard constraint."""
 
     notes: str | None = None
     """Additional context from the user's request that does not fit other fields."""
