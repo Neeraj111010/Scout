@@ -340,12 +340,33 @@ hard_time:
     Otherwise false.
 
 hard_budget:
-    True only when the user clearly requires staying within the budget.
-    Otherwise false.
+    True when the user clearly requires staying within the budget.
+    False when the budget is only a preference or can be exceeded.
+
+budget_operator:
+    Use "lt" when the user says "under ₹X", "below ₹X",
+    or clearly means strictly less than X.
+
+    Use "lte" when the user says "₹X or less",
+    "up to ₹X", "maximum ₹X", or "at most ₹X".
+
+    Use null when no budget is specified.
 
 max_budget_total:
     Maximum total amount for the whole party, in INR.
     Use null if no budget was specified.
+
+prefer_lower_price:
+    True when the user explicitly prefers paying less when
+    otherwise suitable options are available.
+
+    Examples:
+    "preferably cheaper" -> true
+    "cheaper if possible" -> true
+    "I'd rather spend less" -> true
+    "lowest price preferred" -> true
+
+    Otherwise false.
 
 preferred_formats:
     Formats the user prefers but may compromise on.
@@ -367,6 +388,22 @@ preferred_area:
 notes:
     Important user intent that cannot be represented by the other fields.
     Use null if there is nothing additional.
+
+party_size:
+    Number of people/tickets explicitly requested.
+
+    Important:
+    "two people" -> 2
+    "for two" -> 2
+    "2 people" -> 2
+    "three people" -> 3
+    "for three" -> 3
+
+    Do NOT add one person for the user.
+    For example, "Dune 3 with two people" means party_size = 2,
+    not 3.
+
+    If the user does not specify a party size, do not invent one.
 
 Return exactly one JSON object and nothing else.
         """.strip()
@@ -397,6 +434,10 @@ Return exactly one JSON object and nothing else.
                 "max_budget_total": {
                     "type": ["integer", "null"],
                 },
+                "budget_operator": {
+                    "type": ["string", "null"],
+                    "enum": ["lt", "lte", None],
+                },
                 "preferred_formats": {
                     "type": "array",
                     "items": {"type": "string"},
@@ -415,6 +456,7 @@ Return exactly one JSON object and nothing else.
                 "hard_date": {"type": "boolean"},
                 "hard_time": {"type": "boolean"},
                 "hard_budget": {"type": "boolean"},
+                "prefer_lower_price": {"type": "boolean"},
                 "notes": {
                     "type": ["string", "null"],
                 },
@@ -428,6 +470,7 @@ Return exactly one JSON object and nothing else.
                 "time_end",
                 "time_preference",
                 "max_budget_total",
+                "budget_operator",
                 "preferred_formats",
                 "acceptable_formats",
                 "preferred_theatres",
@@ -435,6 +478,7 @@ Return exactly one JSON object and nothing else.
                 "hard_date",
                 "hard_time",
                 "hard_budget",
+                "prefer_lower_price",
                 "notes",
             ],
         }
