@@ -1,4 +1,4 @@
-#scout/ai/gemma.py
+# scout/ai/gemma.py
 import json
 import os
 import re
@@ -66,7 +66,7 @@ class PreferenceNormalizer:
     @staticmethod
     def _parse_date(value: str | None, reference_date: Date) -> Date | None:
         """Convert an explicit date string into a concrete calendar date.
-        
+
         Relative weekdays (e.g. 'saturday') are left null here so the
         deterministic Preference Resolver can handle them using reference_date."""
         if not value or str(value).strip().lower() == "null":
@@ -75,7 +75,15 @@ class PreferenceNormalizer:
         value = value.strip().lower()
 
         # If it's a weekday name, let resolver.py handle it!
-        weekdays = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
+        weekdays = {
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        }
         if value in weekdays:
             return None
 
@@ -84,7 +92,6 @@ class PreferenceNormalizer:
             return Date.fromisoformat(value)
         except ValueError:
             pass
-
 
         # Preferred machine-readable form.
         try:
@@ -137,7 +144,7 @@ class PreferenceNormalizer:
             return None
 
         value = value.strip()
-        
+
         # If Gemma puts a semantic time word into time_start/time_end by mistake, ignore it
         if value.lower() in {"morning", "afternoon", "evening", "night"}:
             return None
@@ -167,7 +174,9 @@ class PreferenceNormalizer:
         for fmt in ("%I %p", "%I:%M %p"):
             try:
                 # Satisfies Ruff DTZ007 by attaching tzinfo before extracting time
-                return datetime.strptime(value.upper(), fmt).replace(tzinfo=ist_tz).time()
+                return (
+                    datetime.strptime(value.upper(), fmt).replace(tzinfo=ist_tz).time()
+                )
             except ValueError:
                 continue
 
@@ -186,7 +195,9 @@ class GemmaPreferenceInterpreter:
         resolved_model = model or os.getenv("OPEN_WEIGHT_MODEL", "gemma3:4b")
         resolved_base_url = base_url or os.getenv("BASE_URL", "http://localhost:11434")
 
-        self.client = client or OllamaClient(base_url=resolved_base_url, model=resolved_model)
+        self.client = client or OllamaClient(
+            base_url=resolved_base_url, model=resolved_model
+        )
 
     def interpret(
         self,
