@@ -10,7 +10,6 @@ from scout.domain.snapshots import MonitoringSnapshot
 from scout.domain.watches import Watch, WatchGoal
 from scout.monitoring.opportunities import detect_opportunities
 
-
 NOW = datetime(2026, 10, 5, 10, 0, tzinfo=UTC)
 
 
