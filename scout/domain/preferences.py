@@ -21,13 +21,13 @@ class PreferenceSpec(BaseModel):
     """Number of people or tickets required for the show."""
 
     date: Date | None = None
-    """Exact preferred calendar date, if the user specified one."""
-
+    """Preferred date for the show, if the user specified one."""
+    
     day_of_week: str | None = None
-    """Preferred day of the week when no exact calendar date was specified.
+    """Preferred day of the week when no exact calendar date was specified (e.g., 'saturday')."""
 
-    Example: "this Saturday" -> "saturday".
-    """
+    time_preference: str | None = None
+    """Semantic time-of-day preference such as 'morning', 'afternoon', or 'evening'."""
 
     time_start: Time | None = None
     """Earliest acceptable show start time for an exact time or time range."""
@@ -35,12 +35,17 @@ class PreferenceSpec(BaseModel):
     time_end: Time | None = None
     """Latest acceptable show start time for an exact time range."""
 
-    time_preference: str | None = None
-    """Semantic time-of-day preference such as 'morning' or 'evening'."""
-
     max_budget_total: int | None = None
     """Maximum total ticket budget for the entire party, in INR."""
-
+    
+    budget_operator:str | None=Field(
+        default=None,
+        description="Comparison operator for budget: 'lt' (<) or 'lte' (<=)",
+    )
+    
+    prefer_lower_price:bool=False
+    """Whether the user explicitly prefers cheaper options within budget"""
+    
     preferred_formats: list[str] = Field(default_factory=list)
     """Formats the user would prefer, but that do not necessarily exclude a show."""
 

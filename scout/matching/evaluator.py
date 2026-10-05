@@ -1,4 +1,4 @@
-# ./scout/matching/evaluator.py
+# scout/matching/evaluator.py
 from scout.domain.matches import CandidateEvaluation
 from scout.domain.metrics import CandidateMetrics
 from scout.domain.preferences import PreferenceSpec
@@ -46,9 +46,13 @@ def _matches_budget(
 
     if preferences.max_budget_total is None:
         return True
-
+    
+    operator = getattr(preferences, "budget_operator", "lte")
+    if operator == "lt":
+        return total_price < preferences.max_budget_total
+    
+    # Default to 'lte' (<=)
     return total_price <= preferences.max_budget_total
-
 
 def _matches_preferred_format(
     show: Show,

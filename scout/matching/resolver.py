@@ -1,4 +1,4 @@
-# ./scout/matching/resolver.py
+# scout/matching/resolver.py
 from datetime import date as Date
 from datetime import time as Time
 from datetime import timedelta
@@ -42,25 +42,31 @@ def resolve_preferences(
 
     updates: dict = {}
 
-    # Resolve day of week
+    # Safely get day_of_week if it exists on PreferenceSpec
+    day_of_week = getattr(preferences, "day_of_week", None)
 
-    if preferences.date is None and preferences.day_of_week:
+    # Resolve day of week
+    if preferences.date is None and day_of_week:
         resolved_date = _resolve_day_of_week(
-            preferences.day_of_week,
+            day_of_week,
             reference_date,
         )
 
         if resolved_date is not None:
             updates["date"] = resolved_date
 
-    # Resolve semantic time preference
+    # Safely get time_preference if it exists on PreferenceSpec
+    time_preference = getattr(preferences, "time_preference", None)
 
+    # Resolve semantic time preference
     if (
         preferences.time_start is None
         and preferences.time_end is None
-        and preferences.time_preference
+        and time_preference
     ):
-        window = TIME_WINDOWS.get(preferences.time_preference.strip().casefold())
+        window = TIME_WINDOWS.get(
+            time_preference.strip().casefold()
+        )
 
         if window:
             updates["time_start"] = window[0]
