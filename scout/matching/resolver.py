@@ -3,7 +3,7 @@ from datetime import date as Date
 from datetime import time as Time
 from datetime import timedelta
 
-from ..domain.preferences import PreferenceSpec
+from scout.domain.preferences import PreferenceSpec
 
 DAY_NAMES = {
     "monday": 0,
@@ -64,9 +64,7 @@ def resolve_preferences(
         and preferences.time_end is None
         and time_preference
     ):
-        window = TIME_WINDOWS.get(
-            time_preference.strip().casefold()
-        )
+        window = TIME_WINDOWS.get(time_preference.strip().casefold())
 
         if window:
             updates["time_start"] = window[0]

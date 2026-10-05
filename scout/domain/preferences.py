@@ -22,7 +22,7 @@ class PreferenceSpec(BaseModel):
 
     date: Date | None = None
     """Preferred date for the show, if the user specified one."""
-    
+
     day_of_week: str | None = None
     """Preferred day of the week when no exact calendar date was specified (e.g., 'saturday')."""
 
@@ -37,15 +37,15 @@ class PreferenceSpec(BaseModel):
 
     max_budget_total: int | None = None
     """Maximum total ticket budget for the entire party, in INR."""
-    
-    budget_operator:str | None=Field(
+
+    budget_operator: str | None = Field(
         default=None,
         description="Comparison operator for budget: 'lt' (<) or 'lte' (<=)",
     )
-    
-    prefer_lower_price:bool=False
+
+    prefer_lower_price: bool = False
     """Whether the user explicitly prefers cheaper options within budget"""
-    
+
     preferred_formats: list[str] = Field(default_factory=list)
     """Formats the user would prefer, but that do not necessarily exclude a show."""
 

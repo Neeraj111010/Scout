@@ -1,8 +1,7 @@
 # scout/matching/ranker.py
-from scout.domain.ranking import RankedCandidate
-
 from scout.domain.matches import CandidateEvaluation
 from scout.domain.preferences import PreferenceSpec
+from scout.domain.ranking import RankedCandidate
 
 
 class CandidateRanker:
@@ -16,7 +15,7 @@ class CandidateRanker:
         """Filter for eligible candidates, calculate weighted scores, and sort descending."""
         eligible_evals = [e for e in evaluations if e.eligible]
         ranked_list = [self._score_candidate(e, preferences) for e in eligible_evals]
-        
+
         # Sort candidates descending by computed score
         return sorted(ranked_list, key=lambda rc: rc.score, reverse=True)
 
@@ -54,7 +53,11 @@ class CandidateRanker:
                 breakdown["format"] = 0.0
 
         # 2. Time Dimension (20 pts max)
-        if preferences.time_start or preferences.time_end or preferences.time_preference:
+        if (
+            preferences.time_start
+            or preferences.time_end
+            or preferences.time_preference
+        ):
             active_max += weights["time"]
             if metrics.time_match:
                 earned += weights["time"]
@@ -93,8 +96,14 @@ class CandidateRanker:
         if preferences.prefer_lower_price and metrics.total_price > 0:
             active_max += weights["price"]
             if metrics.budget_remaining is not None and metrics.budget_remaining >= 0:
-                max_budget = preferences.max_budget_total if preferences.max_budget_total else metrics.total_price
-                headroom_ratio = min(max(metrics.budget_remaining / max(max_budget, 1), 0.0), 1.0)
+                max_budget = (
+                    preferences.max_budget_total
+                    if preferences.max_budget_total
+                    else metrics.total_price
+                )
+                headroom_ratio = min(
+                    max(metrics.budget_remaining / max(max_budget, 1), 0.0), 1.0
+                )
                 price_points = weights["price"] * headroom_ratio
                 earned += price_points
                 breakdown["price"] = round(price_points, 2)
