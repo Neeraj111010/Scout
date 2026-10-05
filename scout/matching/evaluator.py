@@ -46,13 +46,14 @@ def _matches_budget(
 
     if preferences.max_budget_total is None:
         return True
-    
+
     operator = getattr(preferences, "budget_operator", "lte")
     if operator == "lt":
         return total_price < preferences.max_budget_total
-    
+
     # Default to 'lte' (<=)
     return total_price <= preferences.max_budget_total
+
 
 def _matches_preferred_format(
     show: Show,

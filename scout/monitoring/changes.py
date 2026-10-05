@@ -1,3 +1,4 @@
+# ./scout/monitoring/changes.py
 from scout.domain.changes import ChangeType, DetectedChange
 from scout.domain.snapshots import MonitoringSnapshot
 
@@ -19,15 +20,9 @@ def detect_changes(
 
     changes: list[DetectedChange] = []
 
-    previous_shows = {
-        show.id: show
-        for show in previous.shows
-    }
+    previous_shows = {show.id: show for show in previous.shows}
 
-    current_shows = {
-        show.id: show
-        for show in current.shows
-    }
+    current_shows = {show.id: show for show in current.shows}
 
     previous_show_ids = set(previous_shows)
     current_show_ids = set(current_shows)
@@ -75,56 +70,38 @@ def _detect_seat_category_changes(
     changes: list[DetectedChange] = []
 
     previous_categories = {
-        category.name: category
-        for category in previous_show.seat_categories
+        category.name: category for category in previous_show.seat_categories
     }
 
     current_categories = {
-        category.name: category
-        for category in current_show.seat_categories
+        category.name: category for category in current_show.seat_categories
     }
 
-    common_categories = (
-        set(previous_categories) & set(current_categories)
-    )
+    common_categories = set(previous_categories) & set(current_categories)
 
     for category_name in common_categories:
         previous_category = previous_categories[category_name]
         current_category = current_categories[category_name]
 
-        if (
-            previous_category.available_seats
-            != current_category.available_seats
-        ):
+        if previous_category.available_seats != current_category.available_seats:
             changes.append(
                 DetectedChange(
                     change_type=ChangeType.AVAILABILITY_CHANGED,
                     show_id=show_id,
                     seat_category=category_name,
-                    previous_value=str(
-                        previous_category.available_seats
-                    ),
-                    current_value=str(
-                        current_category.available_seats
-                    ),
+                    previous_value=str(previous_category.available_seats),
+                    current_value=str(current_category.available_seats),
                 )
             )
 
-        if (
-            previous_category.price_per_ticket
-            != current_category.price_per_ticket
-        ):
+        if previous_category.price_per_ticket != current_category.price_per_ticket:
             changes.append(
                 DetectedChange(
                     change_type=ChangeType.PRICE_CHANGED,
                     show_id=show_id,
                     seat_category=category_name,
-                    previous_value=str(
-                        previous_category.price_per_ticket
-                    ),
-                    current_value=str(
-                        current_category.price_per_ticket
-                    ),
+                    previous_value=str(previous_category.price_per_ticket),
+                    current_value=str(current_category.price_per_ticket),
                 )
             )
 
